@@ -42,7 +42,7 @@ contactForm.addEventListener("submit", function (event) {
     const formData = new FormData(contactForm);
     
     // REPLACE THIS WITH YOUR WEB3FORMS ACCESS KEY
-    formData.append("access_key", "YOUR_ACCESS_KEY_HERE");
+    formData.append("access_key", "63323a06-9fd4-4b6b-b38e-7b43f33ffbae");
 
     fetch("https://api.web3forms.com/submit", {
         method: "POST",
