@@ -1,123 +1,94 @@
 /* =========================================
-   MOBILE MENU
+   MOBILE MENU TOGGLE
 ========================================= */
 
 const menuBtn = document.getElementById("menuBtn");
 const navLinks = document.getElementById("navLinks");
 
-
 menuBtn.addEventListener("click", function () {
-
     navLinks.classList.toggle("active");
-
 });
 
 
 /* =========================================
-   CLOSE MOBILE MENU AFTER CLICK
+   CLOSE MOBILE MENU ON LINK CLICK
 ========================================= */
 
 const links = document.querySelectorAll(".nav-links a");
 
-
 links.forEach(function (link) {
-
     link.addEventListener("click", function () {
-
         navLinks.classList.remove("active");
-
     });
-
 });
 
 
 /* =========================================
-   CONTACT FORM
+   CONTACT FORM (Web3Forms Backend Integration)
 ========================================= */
 
-const contactForm =
-    document.getElementById("contactForm");
-
+const contactForm = document.getElementById("contactForm");
 
 contactForm.addEventListener("submit", function (event) {
-
     event.preventDefault();
 
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // Disable button and change text while sending
+    submitBtn.textContent = "Sending...";
+    submitBtn.disabled = true;
 
-    const name =
-        document.getElementById("name").value;
+    const formData = new FormData(contactForm);
+    
+    // REPLACE THIS WITH YOUR WEB3FORMS ACCESS KEY
+    formData.append("access_key", "YOUR_ACCESS_KEY_HERE");
 
-    const email =
-        document.getElementById("email").value;
-
-    const subject =
-        document.getElementById("subject").value;
-
-    const message =
-        document.getElementById("message").value;
-
-
-    /*
-        For now this opens the user's
-        email application.
-
-        Later we can connect this form
-        to a real backend/email service.
-    */
-
-    const mailBody =
-        `Name: ${name}%0D%0A` +
-        `Email: ${email}%0D%0A%0D%0A` +
-        `${message}`;
-
-
-    const mailLink =
-        `mailto:yourmail@example.com` +
-        `?subject=${encodeURIComponent(subject)}` +
-        `&body=${mailBody}`;
-
-
-    window.location.href = mailLink;
-
+    fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+    })
+    .then(async (response) => {
+        let json = await response.json();
+        if (json.success) {
+            alert("Thank you! Your message has been sent successfully.");
+            contactForm.reset();
+        } else {
+            alert(json.message || "Something went wrong. Please try again.");
+        }
+    })
+    .catch(error => {
+        console.error("Error sending message:", error);
+        alert("Network error. Please check your connection and try again.");
+    })
+    .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    });
 });
 
 
 /* =========================================
-   SIMPLE SCROLL ANIMATION
+   SCROLL ANIMATION (INTERSECTION OBSERVER)
 ========================================= */
 
-const observer =
-    new IntersectionObserver(
+const observer = new IntersectionObserver(
+    function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("show");
+            }
+        });
+    },
+    {
+        threshold: 0.1
+    }
+);
 
-        function (entries) {
+const animatedElements = document.querySelectorAll(
+    ".project-card, .skill-category, .stat-card, .education-card"
+);
 
-            entries.forEach(function (entry) {
-
-                if (entry.isIntersecting) {
-
-                    entry.target.classList.add("show");
-
-                }
-
-            });
-
-        },
-
-        {
-            threshold: 0.1
-        }
-
-    );
-
-
-const cards =
-    document.querySelectorAll(
-        ".project-card, .skill-category, .stat-card, .education-card"
-    );
-
-
-cards.forEach(function (card) {
-
-    observer.observe(card);
-
+animatedElements.forEach(function (el) {
+    observer.observe(el);
 });
